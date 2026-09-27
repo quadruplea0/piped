@@ -1,4 +1,5 @@
 use cursive::Cursive;
+use cursive::reexports::serde_json::Map;
 use cursive::traits::*;
 use cursive::views::*;
 
@@ -27,6 +28,10 @@ pub fn main_dialog() -> Dialog {
         .child(
             cursive::views::Button::new("Quality: 1080p", cycle_quality).with_name("quality_btn"),
         )
+        .child(
+            cursive::views::Button::new("Directory: ./downloads", edit_directory)
+                .with_name("dir_btn"),
+        )
         .child(DummyView.full_width())
         .child(cursive::views::Button::new("Download", |s| {
             let url = s
@@ -52,6 +57,44 @@ pub fn main_dialog() -> Dialog {
             .child(buttons),
     )
     .title("piped")
+}
+
+fn edit_directory(s: &mut Cursive) {
+    let current = s
+        .user_data::<Settings>()
+        .map(|st| st.directory.clone())
+        .unwrap_or_else(|| "./downloads".to_string());
+    s.add_layer(
+        Dialog::around(
+            EditView::new()
+                .content(current)
+                .on_submit(save_directory)
+                .with_name("dir_input")
+                .fixed_width(50),
+        )
+        .title("Download Directory")
+        .button("Save", |s| {
+            let path = s
+                .call_on_name("dir_input", |v: &mut EditView| v.get_content())
+                .unwrap();
+            save_directory(s, &path);
+        })
+        .button("Cancel", |s| {
+            s.pop_layer();
+        }),
+    );
+}
+
+fn save_directory(s: &mut Cursive, path: &str) {
+    let path = path.trim().to_string();
+    if path.is_empty() {
+        return;
+    }
+    s.with_user_data(|settings: &mut Settings| settings.directory = path.clone());
+    s.call_on_name("dir_bin", |b: &mut Button| {
+        b.set_label(format!("Dir: {path}"))
+    });
+    s.pop_layer();
 }
 
 pub fn set_format(s: &mut Cursive, fmt: &str) {

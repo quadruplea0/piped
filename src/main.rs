@@ -13,6 +13,7 @@ pub const QUALITYS: [&str; 3] = ["1080p", "720p", "480p"];
 pub struct Settings {
     pub format: String,
     pub quality: String,
+    pub directory: String,
 }
 
 fn main() {
@@ -46,6 +47,7 @@ fn main() {
     siv.set_user_data(Settings {
         format: "Video".into(),
         quality: "1080p".into(),
+        directory: "./downloads".into(),
     });
     siv.add_layer(main_dialog());
     siv.run();

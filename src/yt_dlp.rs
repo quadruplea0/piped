@@ -8,6 +8,7 @@ use tokio::process::Command;
 
 use crate::Settings;
 use crate::ui::{bar, main_dialog};
+use ytd_rs::YtDlp;
 
 // start downloading
 pub fn start(s: &mut Cursive, url: &str) {
@@ -18,6 +19,7 @@ pub fn start(s: &mut Cursive, url: &str) {
     let settings = s.user_data::<Settings>().cloned().unwrap_or(Settings {
         format: "Video".into(),
         quality: "1080p".into(),
+        directory: "./downloads".into(),
     });
     s.pop_layer();
     s.add_layer(
@@ -55,13 +57,14 @@ async fn run(url: String, settings: Settings, sink: CbSink) {
         }));
     };
 
+    let mut builder = YtDlp::new(&url)
+        .output_dir(PathBuf::from(&settings.directory))
+        .arg("--newline");
+
     let output_dir = PathBuf::from("./downloads");
     if let Err(e) = tokio::fs::create_dir_all(&output_dir).await {
         return set(0.0, format!("Error: {e}"), true);
     }
-
-    // build the yt-dlp args ourselves, since we spawn the process directly
-    // (this mirrors what ytd_rs::YtDlp::extract_audio_only()/arg() used to build)
     let mut args: Vec<String> = vec!["--newline".into()];
     if settings.format == "Audio" {
         args.push("--format".into());
