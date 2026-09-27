@@ -75,6 +75,8 @@ async fn run(url: String, settings: Settings, sink: CbSink) {
         args.push(format!(
             "bestvideo[height<={height}]+bestaudio/best[height<={height}]"
         ));
+        args.push("-t".into());
+        args.push(format!("mp4"));
     }
     args.push(url);
 

@@ -7,9 +7,9 @@ use crate::{QUALITYS, Settings};
 
 // download formats
 pub fn format_selector(fmt: &str) -> String {
-    let videoselect = if fmt == "Video" { "·" } else { " " };
-    let audioselect = if fmt == "Audio" { "·" } else { " " };
-    format!("| {} video | {} audio |", videoselect, audioselect)
+    let videoselect = if fmt == "Video" { "∙" } else { " " };
+    let audioselect = if fmt == "Audio" { "∙" } else { " " };
+    format!("[{} video ] [{} audio ]", videoselect, audioselect)
 }
 
 // main download dialog
@@ -23,7 +23,7 @@ pub fn main_dialog() -> Dialog {
         .child(cursive::views::Button::new("Audio", |s| {
             set_format(s, "Audio")
         }))
-        .child(DummyView.fixed_width(2))
+        .child(DummyView.full_width())
         .child(
             cursive::views::Button::new("Quality: 1080p", cycle_quality).with_name("quality_btn"),
         )
