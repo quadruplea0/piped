@@ -1,3 +1,4 @@
+use crate::ui::{bar, main_dialog};
 use cursive::traits::*;
 use cursive::views::*;
 use cursive::{CbSink, Cursive};
@@ -5,10 +6,14 @@ use std::path::PathBuf;
 use std::process::Stdio;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
-
-use crate::Settings;
-use crate::ui::{bar, main_dialog};
 use ytd_rs::YtDlp;
+
+#[derive(Clone)]
+pub struct Settings {
+    pub format: String,
+    pub quality: String,
+    pub directory: String,
+}
 
 // start downloading
 pub fn start(s: &mut Cursive, url: &str) {
@@ -40,7 +45,7 @@ pub fn start(s: &mut Cursive, url: &str) {
     });
 }
 
-async fn run(url: String, settings: Settings, sink: CbSink) {
+pub async fn run(url: String, settings: Settings, sink: CbSink) {
     let set = |pct: f32, msg: String, done: bool| {
         let _ = sink.send(Box::new(move |s: &mut Cursive| {
             s.call_on_name("bar", |t: &mut TextView| t.set_content(bar(pct)));
